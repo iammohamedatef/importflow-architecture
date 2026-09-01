@@ -1,6 +1,13 @@
-# Why I won't hold your `service_role` key
+# ADR-001: Why I Won't Hold Your `service_role` Key
 
-> **Status: Architecture decision accepted for Founder-Assisted Alpha. The architecture described below is not a claim of current production execution. Unbuilt mechanisms are described as planned or conditional; §7 states what exists today.**
+**Status:** Accepted — architecture decision for Founder-Assisted Alpha scope
+**Scope:** Supabase integration, Founder-Assisted Alpha (the current phase, in which I personally set up and review each customer integration rather than customers self-provisioning)
+**Date:** <!-- fill in -->
+**Author:** <!-- fill in -->
+
+> This is not a claim of current production execution. Unbuilt mechanisms described below are planned or conditional; §7 states what exists today.
+
+**TL;DR:** ImportFlow's default Supabase integration will not depend on holding a standing `service_role`-class customer credential. §§1–3 explain what I rejected and why. §§4–6 describe the selected architecture — a design, not yet built. §7 is the only section written in present tense, and it's the one to read first if you're deciding whether to approve this integration today.
 
 This document records the architecture decision for the person who would have to approve the integration.
 
@@ -20,7 +27,7 @@ create policy tenant_isolation on public.documents
   using (tenant_id = (auth.jwt() ->> 'org_id')::uuid);
 ```
 
-With the relevant Data API grants, the role’s operations are not constrained by tenant RLS policies.
+With the relevant Data API grants, the role's operations are not constrained by tenant RLS policies.
 
 So a `service_role`-class credential should not be described as equivalent to access constrained by the application's normal tenant RLS boundary.
 
@@ -170,7 +177,7 @@ That signing authority would not itself be a customer database credential.
 
 The planned customer-hosted gateway would still need a project-local mechanism for calling the project's fixed database RPC surface.
 
-For the accepted t1+CA design, that mechanism is planned to use a dedicated project-local `service_role`-class secret available only inside the customer's Supabase project environment.
+For the accepted design, that mechanism is planned to use a dedicated project-local `service_role`-class secret available only inside the customer's Supabase project environment.
 
 ImportFlow would not be designed to receive or retain that secret.
 
@@ -178,7 +185,7 @@ Because the project-local key itself would still map to `service_role`, the desi
 
 The fixed router and the `SECURITY DEFINER` boundary would therefore be load-bearing security boundaries: caller-controlled data would be limited to the fixed accepted operation shape, while the database-side contract function would execute using the deliberately constrained role and contract-specific authority.
 
-With the relevant Data API grants, the `service_role`-class role's operations are not constrained by tenant RLS policies. The planned design therefore would not rely on the project-local secret's own role scope for least privilege; it would rely on keeping that credential inside the customer project and placing the effective database operation behind the fixed gateway and constrained contract execution boundary.
+As established in §1, that access is not constrained by tenant RLS policies. The planned design therefore would not rely on the project-local secret's own role scope for least privilege; it would rely on keeping that credential inside the customer project and placing the effective database operation behind the fixed gateway and constrained contract execution boundary.
 
 Compromise of the customer's own project environment and theft of a project-level secret would remain outside the problem this architecture claims to solve.
 
@@ -192,7 +199,7 @@ The selected Alpha design would require a reviewed migration, a customer-hosted 
 
 Founder-Assisted Alpha is planned to perform those steps with direct founder involvement. Self-serve provisioning is not currently implemented.
 
-I will not publish an integration-time claim until it has been measured against real partner installations.
+I'm not attaching a schedule or engineering-cost estimate to that setup cost, since neither has been measured yet against real partner installations.
 
 **The accepted architecture would initially be Supabase-specific.** A developer-owned HTTP destination can target almost anything.
 
@@ -235,4 +242,3 @@ Ask what authority the integration requires, where that authority lives, what me
 For ImportFlow, that decision is ADR-001.
 
 It records both the architecture selected for Founder-Assisted Alpha and the limits of what that acceptance means today.
-
