@@ -1,6 +1,12 @@
-# ImportFlow
+# ImportFlow Architecture
 
 ImportFlow defines a narrow, fail-closed contract for moving CSV or XLSX data into one Supabase-hosted PostgreSQL table.
+
+This repository is the public architectural record for [ImportFlow](https://importflow.dev). It helps an engineer assess the intended authority model, tradeoffs and implementation boundary. It is not the runtime source repository or a product installation guide.
+
+Start with the [architecture decision index](docs/README.md), or the [current data and authority flow](docs/overview.md). Decisions record context, alternatives, consequences and status. An accepted decision establishes a design choice, not that its mechanisms have shipped.
+
+[PG Import Check](https://check.importflow.dev) is a separate, available [open-source utility](https://github.com/iammohamedatef/pg-import-check). It analyzes supplied PostgreSQL DDL locally in the browser, without a database connection. It reports structural evidence and limits; it neither executes imports nor proves runtime authorization. The [technical guides](https://importflow.dev/guides) explain PostgreSQL/Supabase import techniques beyond ImportFlow's current offer.
 
 ## Status
 

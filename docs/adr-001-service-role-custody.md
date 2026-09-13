@@ -1,9 +1,11 @@
 # ADR-001: Why I Won't Hold Your `service_role` Key
 
 **Status:** Accepted — architecture decision for Founder-Assisted Alpha scope
-**Scope:** Supabase integration, Founder-Assisted Alpha (the current phase, in which I personally set up and review each customer integration rather than customers self-provisioning)
-**Date:** <!-- fill in -->
-**Author:** <!-- fill in -->
+**Scope:** Selected Supabase integration architecture for Founder-Assisted Alpha; installation and runtime execution remain planned.
+**Published:** September 1, 2026 (public repository history; not a newly assigned decision date)
+**Author:** Mohamed Atef
+
+**Current-state clarification — September 13, 2026:** §7 now distinguishes the available static checker from founder-assisted pilot review. The accepted architecture and alternatives are unchanged.
 
 > This is not a claim of current production execution. Unbuilt mechanisms described below are planned or conditional; §7 states what exists today.
 
@@ -53,14 +55,14 @@ If a request timed out, the system would reconcile the outcome before deciding w
 
 That design would eliminate a substantial amount of architecture:
 
-* I would not need a customer-reviewed generated migration for the destination authority.
-* I would not need a dedicated database role and contract-specific grants.
-* I would not need a customer-hosted gateway component.
-* I would not need the planned dual-anchor authorization mechanism.
-* I would not need the planned customer key registry and its rotation/revocation lifecycle.
-* I would not need an in-database idempotency ledger for the selected architecture.
-* I would not need the same contract-specific publication gate.
-* Revocation would primarily mean revoking the credential rather than removing installed gateway authority.
+- I would not need a customer-reviewed generated migration for the destination authority.
+- I would not need a dedicated database role and contract-specific grants.
+- I would not need a customer-hosted gateway component.
+- I would not need the planned dual-anchor authorization mechanism.
+- I would not need the planned customer key registry and its rotation/revocation lifecycle.
+- I would not need an in-database idempotency ledger for the selected architecture.
+- I would not need the same contract-specific publication gate.
+- Revocation would primarily mean revoking the credential rather than removing installed gateway authority.
 
 I will not attach a fabricated schedule or engineering-cost estimate to that decision. The important point is architectural: the simpler design would remove several of the mechanisms required by the selected model.
 
@@ -98,12 +100,12 @@ I did not select it as the Alpha default because it would return several hard co
 
 The customer implementation would need to define and correctly operate:
 
-* idempotency state;
-* replay handling;
-* tenant/system-field enforcement;
-* durable outcome reconciliation;
-* partial-result semantics;
-* error reporting precise enough for the importer workflow.
+- idempotency state;
+- replay handling;
+- tenant/system-field enforcement;
+- durable outcome reconciliation;
+- partial-result semantics;
+- error reporting precise enough for the importer workflow.
 
 That is a valid architecture for organizations that explicitly prefer customer-owned execution. It is retained as a possible future delivery model, but no generic developer-endpoint implementation is part of the accepted Alpha architecture.
 
@@ -227,9 +229,11 @@ Any descriptions in §§4–6 of generated SQL, gateway verification, signatures
 
 The architecture has supporting spike and audit evidence from disposable test environments. That evidence informs the decision and its gates, but it is not a customer deployment or a claim that the production execution system currently exists.
 
-The Compatibility Check is currently manually delivered.
+[PG Import Check](https://check.importflow.dev) is now available as a separate open-source static checker. It analyzes supplied migration/DDL in browser memory without connecting to a database or uploading the SQL. It does not validate source rows, establish effective RLS, or approve pilot eligibility.
 
-A customer can provide schema material for review without providing a destination credential, and the current process can identify supported and unsupported field ownership or destination-shape conditions. The self-serve compatibility-check product experience is not yet implemented.
+The current [founder-assisted pilot](https://importflow.dev/design-partner) remains a manual preparation engagement: one supported Supabase table, insert-only, with sanitized or synthetic material in disposable local staging. The buyer’s engineer reviews and executes the final production `COPY` in the buyer’s environment. ImportFlow does not receive production credentials.
+
+This manual service and the static checker do not establish that the planned gateway or automated importer exists.
 
 That is the current boundary: architecture accepted for Founder-Assisted Alpha; execution path not yet built.
 
